@@ -6,8 +6,8 @@ import requests
 
 
 # Initialize boto3 S3 client and Elasticsearch client
-es_endpoint = os.environ['ES_ENDPOINT']
-es_index = os.environ['ES_INDEX']
+ES_ENDPOINT = os.environ['ES_ENDPOINT']
+ES_INDEX = os.environ['ES_INDEX']
 s3 = boto3.client('s3')
 
 def create_index(es_endpoint, es_index):
@@ -23,7 +23,7 @@ def create_index(es_endpoint, es_index):
         requests.put(f"{es_endpoint}/{es_index}", json=index_settings)
 
 def lambda_handler(event, context):
-    create_index(es_endpoint, es_index)
+    create_index(ES_ENDPOINT, ES_INDEX)
     # Get the object from the event and show its content type
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
@@ -36,7 +36,7 @@ def lambda_handler(event, context):
         # parsed_data = json.loads(data) # or any other parsing method
         parsed_data = {'text': str(data)}
         # Index the parsed data
-        requests.put(f"{es_endpoint}/{es_index}/_doc/", json=parsed_data)
+        requests.put(f"{ES_ENDPOINT}/{ES_INDEX}/_doc/", json=parsed_data)
     except Exception as e:
         print(e)
         raise e

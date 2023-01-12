@@ -14,8 +14,8 @@ resource "aws_lambda_function" "indexer" {
       "ES_INDEX" = "chat_gpt"
     }
   }
-  filename = "indexer/indexer.zip"
-  source_code_hash = filebase64sha256("indexer/indexer.zip")
+  filename = "lambda/indexer/indexer.zip"
+  source_code_hash = filebase64sha256("lambda/indexer/indexer.zip")
 }
 
 resource "aws_lambda_permission" "s3_permission" {
