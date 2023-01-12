@@ -6,7 +6,7 @@ resource "aws_lambda_function" "search" {
   timeout = 15
   environment {
     variables = {
-      "ES_ENDPOINT" = "https://search-chat-overflow-zggssnarczx4oyczzt5h4og4bi.ap-southeast-2.es.amazonaws.com"
+      "ES_ENDPOINT" = "search-chat-overflow-zggssnarczx4oyczzt5h4og4bi.ap-southeast-2.es.amazonaws.com"
       "ES_INDEX" = "chat_gpt"
     }
   }

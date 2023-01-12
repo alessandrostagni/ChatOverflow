@@ -24,6 +24,7 @@ resource "aws_iam_policy" "search_policy" {
         {
             "Effect": "Allow",
             "Action": [
+                "es:ESHttpGet",
                 "es:ESHttpPost"
             ],
             "Resource": [

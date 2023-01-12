@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      function search() {
+        var query = $("#search-box").val();
+        $.ajax({
+          type: "POST",
+          url: "https://7pickqr2ub.execute-api.ap-southeast-2.amazonaws.com/prod/search?q=" + query,
+          dataType: "json",
+          success: function(data) {
+            $("#search-results").html(JSON.stringify(data));
+          },
+          error: function(xhr, status, error) {
+            console.log(xhr);
+            console.log(status);
+            console.log(error);
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div>
+      <input type="text" id="search-box" placeholder="Enter your search query">
+      <button onclick="search()">Search</button>
+    </div>
+    <div id="search-results"></div>
+  </body>
+</html>

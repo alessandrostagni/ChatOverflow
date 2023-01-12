@@ -1,6 +1,9 @@
-import json
 import os
-import requests
+import json
+
+import boto3
+from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
+
 
 # Elasticsearch endpoint
 ES_ENDPOINT = os.environ['ES_ENDPOINT']
@@ -10,26 +13,41 @@ ES_INDEX = os.environ['ES_INDEX']
 
 def lambda_handler(event, context):
     # Get the search query from the event
+    print(event)
     query = event["queryStringParameters"]["q"]
 
+    credentials = boto3.Session().get_credentials()
+    auth = AWSV4SignerAuth(credentials, 'ap-southeast-2')
+
+    client = OpenSearch(
+        hosts = [{'host':  ES_ENDPOINT, 'port': 443}],
+        http_auth = auth,
+        use_ssl = True,
+        verify_certs = True,
+        connection_class = RequestsHttpConnection
+    )
+
     # Construct the Elasticsearch search request
-    data = {
+    query = {
         "query": {
             "fuzzy": {
-                "field": "text",
-                "value": query
+                "text": query
             }
         }
     }
-    headers = { "Content-Type": "application/json" }
-    url = f"{ES_ENDPOINT}/{ES_INDEX}/_search"
-    response = requests.post(url, headers=headers, json=data)
-    
-    # Check for errors
-    response.raise_for_status()
-    
+    response = client.search(
+        body = query,
+        index = ES_INDEX
+    )
+    print(response['hits']['hits'])
+
     # Return the search results
     return {
+        "isBase64Encoded": False,
         "statusCode": 200,
-        "body": json.dumps(response.json()["hits"])
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "content-type": "application/json"
+        },
+        "body": json.dumps([h['_source']['text'] for h in response['hits']['hits']])
     }

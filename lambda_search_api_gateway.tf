@@ -35,3 +35,11 @@ resource "aws_api_gateway_stage" "search" {
   stage_name    = "prod"
   depends_on = [aws_api_gateway_deployment.search]
 }
+
+resource "aws_lambda_permission" "apigateway_lambda_permission" {
+  statement_id  = "AllowExecutionFromApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.search.arn}"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.search.execution_arn}/*"
+}
