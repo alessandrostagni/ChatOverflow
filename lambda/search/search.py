@@ -40,7 +40,7 @@ def lambda_handler(event, context):
         body=query,
         index=ES_INDEX
     )
-    print(response['hits']['hits'])
+    print(response)
 
     # Return the search results
     return {
@@ -50,7 +50,9 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Origin": "*",
             "content-type": "application/json"
         },
-        "body": json.dumps(
-            [h['_source']['text'] for h in response['hits']['hits']]
-        )
+        "body": json.dumps([{
+                "text": h['_source']['text'],
+                "full_convo_s3_key": h['_source']['full_convo_s3_key']
+            } for h in response['hits']['hits']
+        ])
     }
