@@ -9,9 +9,10 @@ ES_ENDPOINT = os.environ['ES_ENDPOINT']
 ES_INDEX = os.environ['ES_INDEX']
 s3 = boto3.client('s3')
 
+
 def create_index(client, es_endpoint, es_index):
     body = {
-        "mappings":{
+        "mappings": {
             "properties": {
                 "text": {"type": "text", "analyzer": "english"}
             }
@@ -19,15 +20,16 @@ def create_index(client, es_endpoint, es_index):
     }
     client.index(index=es_index, body=body)
 
+
 def lambda_handler(event, context):
     credentials = boto3.Session().get_credentials()
     auth = AWSV4SignerAuth(credentials, 'ap-southeast-2')
     client = OpenSearch(
-        hosts = [{'host':  ES_ENDPOINT, 'port': 443}],
-        http_auth = auth,
-        use_ssl = True,
-        verify_certs = True,
-        connection_class = RequestsHttpConnection
+        hosts=[{'host':  ES_ENDPOINT, 'port': 443}],
+        http_auth=auth,
+        use_ssl=True,
+        verify_certs=True,
+        connection_class=RequestsHttpConnection
     )
     create_index(client, ES_ENDPOINT, ES_INDEX)
 
