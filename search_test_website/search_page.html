@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       function search() {
@@ -8,7 +9,6 @@
         $.ajax({
           type: "POST",
           url: "https://7pickqr2ub.execute-api.ap-southeast-2.amazonaws.com/prod/search?q=" + query,
-          dataType: "json",
           success: function(data) {
             $("#search-results").html(JSON.stringify(data));
           },
@@ -22,7 +22,7 @@
     </script>
   </head>
   <body>
-    <div>
+    <div class="search-container">
       <input type="text" id="search-box" placeholder="Enter your search query">
       <button onclick="search()">Search</button>
     </div>

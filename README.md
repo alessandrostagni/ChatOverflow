@@ -22,4 +22,3 @@ Contact us at ![name](./img/email.png).
 - [ ]Deploy search website online
 - [ ]Show partial conversation text. Link to full conversation.
 - [ ]User login and metadata on user who uploads.
-
