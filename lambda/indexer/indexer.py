@@ -1,4 +1,5 @@
 import boto3
+import hashlib
 import os
 
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
@@ -53,11 +54,13 @@ def lambda_handler(event, context):
         chunks = split_conversation(data.decode("utf-8"))
         # Index chunks
         for chunk in chunks:
+            text = convo_delimiter.join(chunk)
             index_data = {
-                'text': convo_delimiter.join(chunk),
+                'text': text,
                 'full_convo_s3_key': f's3://{bucket}/{key}'
             }
-            client.index(index=ES_INDEX, body=index_data)
+            chunk_id = hashlib.sha3_512(text.encode('utf-8')).hexdigest()
+            client.index(id=chunk_id, index=ES_INDEX, body=index_data)
     except Exception as e:
         print(e)
         raise e

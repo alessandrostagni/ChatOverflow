@@ -24,7 +24,8 @@ resource "aws_iam_policy" "indexer_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "es:ESHttpPost"
+                "es:ESHttpPost",
+                "es:ESHttpPut"
             ],
             "Resource": [
                 "arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/${aws_elasticsearch_domain.elasticsearch.domain_name}/*"

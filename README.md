@@ -17,9 +17,9 @@ Contact us at ![name](./img/email.png).
 - Terraform state remotely stored
 - [x]Deployment instructions
 - [x]Chunk driven Indexing
-- Capability of seeing full conversation
-- Better Testing UI
-- Deploy search website online
-- Show partial conversation text. Link to full conversation.
-- User login and metadata on user who uploads.
+- [ ]Capability of seeing full conversation
+- [ ]Better Testing UI
+- [ ]Deploy search website online
+- [ ]Show partial conversation text. Link to full conversation.
+- [ ]User login and metadata on user who uploads.
 
