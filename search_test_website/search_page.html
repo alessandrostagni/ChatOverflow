@@ -10,7 +10,27 @@
           type: "POST",
           url: "https://7pickqr2ub.execute-api.ap-southeast-2.amazonaws.com/prod/search?q=" + query,
           success: function(data) {
-            $("#search-results").html(JSON.stringify(data));
+            //$("#search-results").html(JSON.stringify(data));
+            let conversations = JSON.parse(JSON.stringify(data));
+            let searchResultsDiv = $("#search-results");
+            searchResultsDiv.innerHTML="";
+            for (let conv_i = 0; conv_i < conversations.length; conv_i++){
+              console.log(conversations);
+              let conversation = conversations[conv_i]["text"];
+              let messages = conversation.split("--------------------------");
+              let conversationDiv = $("#conversation");
+    
+              for (let i = 0; i < messages.length; i++) {
+                let message = messages[i];
+                let messageContainer = $("<div>", { class: "message-container" });
+                let messageDiv = $("<div>", { class: "message" });
+                let messageContent = $("<div>", { class: "message-content", text: message });
+                messageDiv.append(messageContent);
+                messageContainer.append(messageDiv);
+                conversationDiv.append(messageContainer);
+                searchResultsDiv.append(messageContainer);
+              }
+            }
           },
           error: function(xhr, status, error) {
             console.log(xhr);
@@ -22,10 +42,22 @@
     </script>
   </head>
   <body>
+    <div class="header">
+      <h1>Chat<span class="highlight">Overflow</span></h1>
+      <p>Find the answers you need to your coding questions</p>
+    </div>
     <div class="search-container">
-      <input type="text" id="search-box" placeholder="Enter your search query">
+      <input type="text" id="search-box" placeholder="Enter your search query" autofocus>
       <button onclick="search()">Search</button>
     </div>
     <div id="search-results"></div>
+  <script>
+    document.getElementById("search-box").addEventListener("keyup", function(event) {
+      event.preventDefault();
+      if (event.keyCode === 13) {
+        search();
+      }
+    });
+  </script>
   </body>
 </html>
