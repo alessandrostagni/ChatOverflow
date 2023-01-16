@@ -57,18 +57,13 @@ def get_documents_by_query(client, query):
         ])
     }
 
-def get_document_by_id(client, doc_id):
-    query = {
-      "query": {
-        "ids": {
-          "values": [
-            doc_id
-          ]
-        }
-      }
-    }
-    response = client.search(body=query,index=ES_INDEX)
-    # Return the search results
+def get_document_by_s3_file(client, s3_file):
+    s3 = boto3.client('s3')
+    uri_without_prefix = s3_file.replace("s3://", "")
+    bucket = uri_without_prefix.split('/')[0]
+    key = '/'.join(uri_without_prefix.split('/')[1:])
+    response = s3.get_object(Bucket=bucket, Key=key)
+    data = response['Body'].read().decode("utf-8")
     return {
         "isBase64Encoded": False,
         "statusCode": 200,
@@ -76,12 +71,9 @@ def get_document_by_id(client, doc_id):
             "Access-Control-Allow-Origin": "*",
             "content-type": "application/json"
         },
-        "body": json.dumps([{
-                "id": h['_id'],
-                "text": h['_source']['text'],
-                "full_convo_s3_key": h['_source']['full_convo_s3_key']
-            } for h in response['hits']['hits']
-        ])
+        "body": json.dumps({
+            "text": data
+        })
     }
 
 def bad_request():
@@ -101,8 +93,8 @@ def lambda_handler(event, context):
         query = event["queryStringParameters"]["q"]
         client = get_client()
         return get_documents_by_query(client, query)
-    elif 'doc_id' in event["queryStringParameters"]:
-        doc_id = event["queryStringParameters"]["doc_id"]
+    elif 's3_file' in event["queryStringParameters"]:
+        doc_id = event["queryStringParameters"]["s3_file"]
         client = get_client()
-        return get_document_by_id(client, doc_id)
+        return get_document_by_s3_file(client, doc_id)
     return bad_request()

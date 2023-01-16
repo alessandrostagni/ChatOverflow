@@ -4,6 +4,33 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+      function full_convo(s3_file) {
+        $.ajax({
+          type: "POST",
+          url: "https://7pickqr2ub.execute-api.ap-southeast-2.amazonaws.com/prod/search?s3_file=" + s3_file,
+          success: function(data) {
+            let conversation = JSON.parse(JSON.stringify(data))["text"];
+            let searchResultsDiv = $("#search-results");
+            searchResultsDiv.empty();
+            let messages = conversation.split("--------------------------");
+            for (let i = 0; i < messages.length; i++) {
+              let message = messages[i];
+              let messageContainer = $("<div>", { class: "message-container" });
+              let messageDiv = $("<div>", { class: "message" });
+              let messageContent = $("<div>", { class: "message-content", text: message });
+              messageDiv.append(messageContent);
+              messageContainer.append(messageDiv);
+              searchResultsDiv.append(messageContainer);
+            }
+          },
+          error: function(xhr, status, error) {
+            console.log(xhr);
+            console.log(status);
+            console.log(error);
+          }
+        });
+      }
+      
       function search() {
         var query = $("#search-box").val();
         $.ajax({
@@ -28,6 +55,9 @@
                 messageContainer.append(messageDiv);
                 searchResultsDiv.append(messageContainer);
               }
+              searchResultsDiv.append(
+                '<div><a href="#" onclick=full_convo("' + conversations[conv_i]["full_convo_s3_key"] + '");>Full conversation</a></div>'
+              )
               searchResultsDiv.append('<div class="group-separator">')
               searchResultsDiv.append("</div></br></br>")
             }

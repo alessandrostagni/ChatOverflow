@@ -39,7 +39,17 @@ resource "aws_iam_policy" "search_policy" {
                 "logs:PutLogEvents"
             ],
             "Resource": "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-        }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::docstorage-chatoverflow",
+                "arn:aws:s3:::docstorage-chatoverflow/*"
+            ]
+        },
     ]
   })
 }

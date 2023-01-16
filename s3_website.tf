@@ -13,6 +13,7 @@ resource "aws_s3_object" "s3_website_html" {
   source = "search_test_website/index.html"
   acl    = "public-read"
   content_type = "text/html"
+  etag = filemd5("search_test_website/index.html")
 }
 
 resource "aws_s3_object" "s3_website_css" {
@@ -21,4 +22,5 @@ resource "aws_s3_object" "s3_website_css" {
   source = "search_test_website/style.css"
   acl    = "public-read"
   content_type = "text/css"
+  etag = filemd5("search_test_website/style.css")
 }
