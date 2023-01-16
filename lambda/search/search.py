@@ -29,10 +29,8 @@ def get_documents_by_query(client, query):
     # Construct the Elasticsearch search request
     query = {
         "query": {
-            "multi_match": {
-                "query": query,
-                "fields": ["text"],
-                "fuzziness":"AUTO"
+            "match": {
+                "text": query
             }
         }
     }
@@ -40,6 +38,15 @@ def get_documents_by_query(client, query):
         body=query,
         index=ES_INDEX
     )
+
+    # Query explanation for debugging
+    # for doc_id in [h['_id'] for h in response['hits']['hits']]:
+    #     explanation = client.explain(
+    #         id=doc_id,
+    #         body=query,
+    #         index=ES_INDEX
+    #     )
+    #     print(explanation)
 
     # Return the search results
     return {
@@ -52,7 +59,8 @@ def get_documents_by_query(client, query):
         "body": json.dumps([{
                 "id": h['_id'],
                 "text": h['_source']['text'],
-                "full_convo_s3_key": h['_source']['full_convo_s3_key']
+                "full_convo_s3_key": h['_source']['full_convo_s3_key'],
+                "score": h['_score']
             } for h in response['hits']['hits']
         ])
     }

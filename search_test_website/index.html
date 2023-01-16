@@ -41,6 +41,9 @@
             let searchResultsDiv = $("#search-results");
             console.log(conversations.length)
             searchResultsDiv.empty();
+            if (conversations.length == 0) {
+              searchResultsDiv.append("No results found.")
+            }
             for (let conv_i = 0; conv_i < conversations.length; conv_i++){
               console.log(conversations);
               let conversation = conversations[conv_i]["text"];
