@@ -14,7 +14,7 @@ You will need a password to access the website:
 Contact us at ![name](./img/email.png).
 
 # Roadmap
-- Terraform state remotely stored
+- [ ]Terraform state remotely stored
 - [x]Deployment instructions
 - [x]Chunk driven Indexing
 - [ ]Capability of seeing full conversation

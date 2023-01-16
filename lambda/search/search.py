@@ -31,8 +31,10 @@ def lambda_handler(event, context):
     # Construct the Elasticsearch search request
     query = {
         "query": {
-            "fuzzy": {
-                "text": query
+            "multi_match": {
+                "query": query,
+                "fields": ["text"],
+                "fuzziness":"AUTO"
             }
         }
     }

@@ -26,7 +26,7 @@ def create_index(client, es_endpoint, es_index):
 
 def split_conversation(data):
     chunks = data.split(convo_delimiter)
-    chunks = [chunks[x:x+chunks_length] for x in range(0, len(chunks), 100)]
+    chunks = [chunks[x:x+chunks_length] for x in range(0, len(chunks), chunks_length)]
     return chunks
 
 
@@ -55,6 +55,7 @@ def lambda_handler(event, context):
         # Index chunks
         for chunk in chunks:
             text = convo_delimiter.join(chunk)
+            print(text)
             index_data = {
                 'text': text,
                 'full_convo_s3_key': f's3://{bucket}/{key}'

@@ -10,15 +10,14 @@
           type: "POST",
           url: "https://7pickqr2ub.execute-api.ap-southeast-2.amazonaws.com/prod/search?q=" + query,
           success: function(data) {
-            //$("#search-results").html(JSON.stringify(data));
             let conversations = JSON.parse(JSON.stringify(data));
             let searchResultsDiv = $("#search-results");
-            searchResultsDiv.innerHTML="";
+            console.log(conversations.length)
+            searchResultsDiv.empty();
             for (let conv_i = 0; conv_i < conversations.length; conv_i++){
               console.log(conversations);
               let conversation = conversations[conv_i]["text"];
               let messages = conversation.split("--------------------------");
-              let conversationDiv = $("#conversation");
     
               for (let i = 0; i < messages.length; i++) {
                 let message = messages[i];
@@ -27,9 +26,10 @@
                 let messageContent = $("<div>", { class: "message-content", text: message });
                 messageDiv.append(messageContent);
                 messageContainer.append(messageDiv);
-                conversationDiv.append(messageContainer);
                 searchResultsDiv.append(messageContainer);
               }
+              searchResultsDiv.append('<div class="group-separator">')
+              searchResultsDiv.append("</div></br></br>")
             }
           },
           error: function(xhr, status, error) {
@@ -48,10 +48,17 @@
     </div>
     <div class="search-container">
       <input type="text" id="search-box" placeholder="Enter your search query" autofocus>
-      <button onclick="search()">Search</button>
+      <button class="button" onclick="search()">Search</button>
+        <a class="button" href="https://chatoverflow.retool.com/embedded/public/f07fa3a5-8f91-4011-8d7f-1217d4a79ee6">Upload your conversation</a>
+      </form>    
     </div>
     <div id="search-results"></div>
   <script>
+    function changeLabel(){
+      var input = document.getElementById("file-input");
+      var label = document.getElementById("label-file-input");
+      label.innerHTML = input.files[0].name;
+    }
     document.getElementById("search-box").addEventListener("keyup", function(event) {
       event.preventDefault();
       if (event.keyCode === 13) {
