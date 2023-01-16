@@ -12,11 +12,7 @@ ES_ENDPOINT = os.environ['ES_ENDPOINT']
 ES_INDEX = os.environ['ES_INDEX']
 
 
-def lambda_handler(event, context):
-    # Get the search query from the event
-    print(event)
-    query = event["queryStringParameters"]["q"]
-
+def get_client():
     credentials = boto3.Session().get_credentials()
     auth = AWSV4SignerAuth(credentials, 'ap-southeast-2')
 
@@ -27,7 +23,9 @@ def lambda_handler(event, context):
         verify_certs=True,
         connection_class=RequestsHttpConnection
     )
+    return client
 
+def get_documents_by_query(client, query):
     # Construct the Elasticsearch search request
     query = {
         "query": {
@@ -58,3 +56,53 @@ def lambda_handler(event, context):
             } for h in response['hits']['hits']
         ])
     }
+
+def get_document_by_id(client, doc_id):
+    query = {
+      "query": {
+        "ids": {
+          "values": [
+            doc_id
+          ]
+        }
+      }
+    }
+    response = client.search(body=query,index=ES_INDEX)
+    # Return the search results
+    return {
+        "isBase64Encoded": False,
+        "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "content-type": "application/json"
+        },
+        "body": json.dumps([{
+                "id": h['_id'],
+                "text": h['_source']['text'],
+                "full_convo_s3_key": h['_source']['full_convo_s3_key']
+            } for h in response['hits']['hits']
+        ])
+    }
+
+def bad_request():
+    return {
+        "isBase64Encoded": False,
+        "statusCode": 400,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "content-type": "application/json"
+        },
+        "body": "Bad Request."
+    }
+
+def lambda_handler(event, context):
+    # Get the search query from the event
+    if 'q' in event["queryStringParameters"]:
+        query = event["queryStringParameters"]["q"]
+        client = get_client()
+        return get_documents_by_query(client, query)
+    elif 'doc_id' in event["queryStringParameters"]:
+        doc_id = event["queryStringParameters"]["doc_id"]
+        client = get_client()
+        return get_document_by_id(client, doc_id)
+    return bad_request()
