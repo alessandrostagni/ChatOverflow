@@ -19,6 +19,6 @@ Contact us at ![name](./img/email.png).
 - [x]Chunk driven Indexing
 - [ ]Capability of seeing full conversation
 - [x]Better Testing UI
-- [ ]Deploy search website online
+- [x]Deploy search website online
 - [ ]Show partial conversation text. Link to full conversation.
 - [ ]User login and metadata on user who uploads.
