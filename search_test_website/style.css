@@ -32,6 +32,7 @@ body {
     color: white;
     border: none;
     margin-right: 10px;
+    cursor: hand;
   }
   
   #search-results {

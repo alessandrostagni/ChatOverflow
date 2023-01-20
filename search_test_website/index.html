@@ -1,9 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-highlight/prism-line-highlight.min.css" integrity="sha512-nXlJLUeqPMp1Q3+Bd8Qds8tXeRVQscMscwysJm821C++9w6WtsFbJjPenZ8cQVMXyqSAismveQJc0C1splFDCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+      function copy_to_clipboard(i) {
+        let code = document.getElementById("code-" + i);
+        navigator.clipboard.writeText(code.innerHTML);
+      }
+      function format_code(div, text) {
+        var code_prefix = "Copy code"
+        var lines = text.split("\n");
+        var code_text = ""
+        var code_to_copy = ""
+        var code = false
+        var code_snippet_counter = 0;
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i] == code_prefix) {
+            code_text += "<pre><code id=\"code-" + code_snippet_counter + "\" class=\"language-none\">\n"
+            code = true
+          }
+          else if (code && i < lines.length + 1 && lines[i] == "" && lines[i + 1] == "") {
+            code_text += code_to_copy + "</code></pre>\n"
+            code_text = "<a class=\"button\" href=\"javascript:copy_to_clipboard(" + code_snippet_counter + ")\">Copy Code</a>" + code_text
+            div.append(code_text)
+            code_text = ""
+            code_snippet_counter++;
+            code = false
+          }
+          else if (code) {
+            code_to_copy += lines[i] + "\n"
+          }
+          else {
+            var noHtmlText = lines[i] + "\n"
+            auxDiv = $("<div>")
+            div.append(auxDiv.text(noHtmlText))
+          }
+        }
+        return div
+      }
       function full_convo(s3_file) {
         $.ajax({
           type: "POST",
@@ -17,7 +54,8 @@
               let message = messages[i];
               let messageContainer = $("<div>", { class: "message-container" });
               let messageDiv = $("<div>", { class: "message" });
-              let messageContent = $("<div>", { class: "message-content", text: message });
+              let messageContent = $("<div>", { class: "message-content" });
+              messageContent = format_code(messageContent, message)
               messageDiv.append(messageContent);
               messageContainer.append(messageDiv);
               searchResultsDiv.append(messageContainer);
@@ -39,13 +77,11 @@
           success: function(data) {
             let conversations = JSON.parse(JSON.stringify(data));
             let searchResultsDiv = $("#search-results");
-            console.log(conversations.length)
             searchResultsDiv.empty();
             if (conversations.length == 0) {
               searchResultsDiv.append("No results found.")
             }
             for (let conv_i = 0; conv_i < conversations.length; conv_i++){
-              console.log(conversations);
               let conversation = conversations[conv_i]["text"];
               let messages = conversation.split("--------------------------");
     
@@ -53,7 +89,8 @@
                 let message = messages[i];
                 let messageContainer = $("<div>", { class: "message-container" });
                 let messageDiv = $("<div>", { class: "message" });
-                let messageContent = $("<div>", { class: "message-content", text: message });
+                let messageContent = $("<div>", { class: "message-content" });
+                messageContent = format_code(messageContent, message)
                 messageDiv.append(messageContent);
                 messageContainer.append(messageDiv);
                 searchResultsDiv.append(messageContainer);
@@ -81,7 +118,7 @@
     </div>
     <div class="search-container">
       <input type="text" id="search-box" placeholder="Enter your search query" autofocus>
-      <button class="button" onclick="search()">Search</button>
+      <a class="button" href="javascript:search()">Search</button>
         <a class="button" href="https://chatoverflow.retool.com/embedded/public/f07fa3a5-8f91-4011-8d7f-1217d4a79ee6">Upload your conversation</a>
       </form>    
     </div>
