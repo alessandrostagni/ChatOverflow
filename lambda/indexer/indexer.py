@@ -50,18 +50,23 @@ def lambda_handler(event, context):
         response = s3.get_object(Bucket=bucket, Key=key)
         # Read the file
         data = response['Body'].read()
+        # Generate new file to avoid collisions
+        new_key_filename = hashlib.sha3_512(data).hexdigest()
+        new_key = f'indexed/{new_key_filename}'
+        s3.put_object(Bucket=bucket, Key=new_key, Body=data)
         # Get conversation chunks to be indexed
         chunks = split_conversation(data.decode("utf-8"))
         # Index chunks
         for chunk in chunks:
             text = convo_delimiter.join(chunk)
-            print(text)
             index_data = {
                 'text': text,
-                'full_convo_s3_key': f's3://{bucket}/{key}'
+                'full_convo_s3_key': f's3://{bucket}/{new_key}'
             }
             chunk_id = hashlib.sha3_512(text.encode('utf-8')).hexdigest()
             client.index(id=chunk_id, index=ES_INDEX, body=index_data)
+        # Delete old file
+        s3.delete_object(Bucket=bucket, Key=key)
     except Exception as e:
         print(e)
         raise e
